@@ -1,90 +1,3 @@
-//package org.example.service;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import io.github.cdimascio.dotenv.Dotenv;
-//import org.example.model.APIParam;
-//import org.example.model.ModelResponse;
-//
-//import java.net.URI;
-//import java.net.http.HttpClient;
-//import java.net.http.HttpRequest;
-//import java.net.http.HttpResponse;
-//import java.util.HashMap;
-//import java.util.Map;
-//
-//public class APIService {
-//    private static final APIService instance = new APIService();
-//    private final HttpClient httpClient = HttpClient.newHttpClient();
-//    private final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
-//    private final String groqToken;
-//    private final String togetherToken;
-//    private final String groqGuide;
-//    private final String togetherGuide;
-//    private final String geminiToken;
-//    private final String geminiGuide;
-//
-//
-//    public static APIService getInstance() {
-//        return instance;
-//    }
-//
-//    private APIService() {
-//        groqToken = dotenv.get("GROQ_KEY");
-//        togetherToken = dotenv.get("TOGETHER_KEY");
-//        groqGuide = dotenv.get("GROQ_GUIDE");
-//        togetherGuide = dotenv.get("TOGETHER_GUIDE");
-//        geminiToken = dotenv.get("GEMINI_KEY");
-//        geminiGuide = dotenv.get("GEMINI_GUIDE");
-//    }
-//
-//    public String callAPI(APIParam apiParam) throws Exception {
-//        String url;
-//        String token;
-//        String instruction;
-//        switch (apiParam.model().platform) {
-//            case GROQ -> {
-//                url = "https://api.groq.com/openai/v1/chat/completions";
-//                token = groqToken;
-//                instruction = groqGuide;
-//            }
-//            case TOGETHER -> {
-//                url = "https://api.together.xyz/v1/chat/completions";
-//                token = togetherToken;
-//                instruction = togetherGuide;
-//            }
-//            default -> throw new Exception("Unsupported platform");
-//        }
-//            String body = """
-//                    {
-//                             "messages": [
-//                               {
-//                                 "role": "system",
-//                                 "content": "%s"
-//                               },
-//                               {
-//                                 "role": "user",
-//                                 "content": "%s"
-//                               }
-//                             ],
-//                             "model": "%s"
-//                           }
-//                    """.formatted(instruction, apiParam.prompt(), apiParam.model().name);
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create(url))
-//                .POST(HttpRequest.BodyPublishers.ofString(body))
-//                .header("Authorization", "Bearer %s".formatted(token))
-//                .header("Content-Type", "application/json")
-//                .build();
-//        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-//        String responseBody = response.body();
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        ModelResponse modelResponse = objectMapper.readValue(responseBody, ModelResponse.class);
-//        String content = modelResponse.choices().get(0).message().content();
-//        Map<String, String> map = new HashMap<>();
-//        map.put("content", content);
-//        return objectMapper.writeValueAsString(map);
-//    }
-//}
 package org.example.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -332,14 +245,15 @@ public class APIService {
 
                 return String.format("""
                     당신은 뛰어난 소설가입니다. 다음 정보를 바탕으로 소설의 다음 챕터를 작성해주세요.
-                    
+
                     장르: %s
                     문체: %s
-                    
+
                     이전 내용 요약:
                     %s
-                    
+
                     %s장을 작성해주세요. 일관된 등장인물과 세계관을 유지하며, 이전 내용과 자연스럽게 이어지도록 해주세요.
+                    주의: 다른 언어로 응답할 경우 시스템 오류가 발생합니다. 반드시 한국어로만 응답하세요.
                     """,
                         toggleValues.getOrDefault("genre", "지정되지 않음"),
                         toggleValues.getOrDefault("style", "지정되지 않음"),
@@ -363,15 +277,16 @@ public class APIService {
 
             return String.format("""
                 당신은 뛰어난 소설가입니다. 다음 정보를 바탕으로 소설을 작성해주세요.
-                
+
                 장르: %s
                 문체: %s
                 길이: %s
-                
+
                 다음 설정에 맞는 매력적인 소설을 작성해주세요:
                 %s
-                
+
                 소설에는 적절한 제목을 포함해주세요. 창의적이고 몰입감 있는 스토리를 만들어주세요.
+                주의: 다른 언어로 응답할 경우 시스템 오류가 발생합니다. 반드시 한국어로만 응답하세요.
                 """,
                     toggleValues.get("genre"),
                     toggleValues.get("style"),
