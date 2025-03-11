@@ -1,3 +1,854 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="ko">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>AI 소설 생성기</title>-->
+<!--    <link-->
+<!--            rel="icon"-->
+<!--            type="image/png"-->
+<!--            href="./icons8-글쓰기-능력-stickers-96.png"-->
+<!--            sizes="96x96"-->
+<!--    />-->
+<!--    <style>-->
+<!--        @font-face {-->
+<!--            font-family: 'CookieRun-Regular';-->
+<!--            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/CookieRun-Regular.woff') format('woff');-->
+<!--            font-weight: normal;-->
+<!--            font-style: normal;-->
+<!--        }-->
+<!--        * {-->
+<!--            font-family: CookieRun-Regular, serif;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+<!--        body {-->
+<!--            background-color: #f5f5f5;-->
+<!--            color: #333;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 800px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 2rem;-->
+<!--        }-->
+<!--        header {-->
+<!--            text-align: center;-->
+<!--            margin-bottom: 2rem;-->
+<!--        }-->
+<!--        h1 {-->
+<!--            color: #6a4c93;-->
+<!--            margin-bottom: 0.5rem;-->
+<!--        }-->
+<!--        .subtitle {-->
+<!--            color: #666;-->
+<!--            font-size: 1rem;-->
+<!--        }-->
+<!--        .input-section {-->
+<!--            background-color: white;-->
+<!--            padding: 1.5rem;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);-->
+<!--            margin-bottom: 2rem;-->
+<!--        }-->
+<!--        .form-group {-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+<!--        label {-->
+<!--            display: block;-->
+<!--            margin-bottom: 0.5rem;-->
+<!--            font-weight: bold;-->
+<!--            color: #555;-->
+<!--        }-->
+<!--        input, select, textarea {-->
+<!--            width: 100%;-->
+<!--            padding: 0.8rem;-->
+<!--            border: 1px solid #ddd;-->
+<!--            border-radius: 5px;-->
+<!--            font-size: 1rem;-->
+<!--        }-->
+<!--        .options-grid {-->
+<!--            display: grid;-->
+<!--            grid-template-columns: 1fr 1fr;-->
+<!--            gap: 1rem;-->
+<!--        }-->
+<!--        button {-->
+<!--            background-color: #6a4c93;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 0.8rem 1.5rem;-->
+<!--            border-radius: 5px;-->
+<!--            font-size: 1rem;-->
+<!--            cursor: pointer;-->
+<!--            transition: background-color 0.3s;-->
+<!--            width: 100%;-->
+<!--        }-->
+<!--        button:hover {-->
+<!--            background-color: #583d7a;-->
+<!--        }-->
+<!--        .result-section {-->
+<!--            background-color: white;-->
+<!--            padding: 1.5rem;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);-->
+<!--            min-height: 300px;-->
+<!--            position: relative;-->
+<!--        }-->
+<!--        .novel-content {-->
+<!--            white-space: pre-wrap;-->
+<!--            line-height: 1.6;-->
+<!--            font-family: "Nanum Myeongjo", serif;-->
+<!--            padding: 1rem;-->
+<!--            max-height: 500px;-->
+<!--            overflow-y: auto;-->
+<!--        }-->
+<!--        .loading {-->
+<!--            display: none;-->
+<!--            position: absolute;-->
+<!--            top: 50%;-->
+<!--            left: 50%;-->
+<!--            transform: translate(-50%, -50%);-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        .loading img {-->
+<!--            width: 50px;-->
+<!--            height: 50px;-->
+<!--        }-->
+<!--        .controls {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            margin-top: 1rem;-->
+<!--        }-->
+<!--        .control-btn {-->
+<!--            background-color: #f0f0f0;-->
+<!--            color: #333;-->
+<!--            border: 1px solid #ddd;-->
+<!--            padding: 0.5rem 1rem;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--        .chapters {-->
+<!--            margin-top: 1rem;-->
+<!--            display: flex;-->
+<!--            flex-wrap: wrap;-->
+<!--            gap: 0.5rem;-->
+<!--        }-->
+<!--        .chapter-btn {-->
+<!--            background-color: #f0f0f0;-->
+<!--            color: #333;-->
+<!--            border: 1px solid #ddd;-->
+<!--            padding: 0.3rem 0.6rem;-->
+<!--            border-radius: 3px;-->
+<!--            cursor: pointer;-->
+<!--            font-size: 0.8rem;-->
+<!--        }-->
+<!--        .chapter-btn.active {-->
+<!--            background-color: #6a4c93;-->
+<!--            color: white;-->
+<!--            border-color: #6a4c93;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <header>-->
+<!--        <h1>아주 소설 쓰고 앉아있네</h1>-->
+<!--        <p class="subtitle">진짜 소설 쓰겠습니다.</p>-->
+<!--    </header>-->
+
+<!--    <div class="input-section">-->
+<!--        <form id="storyForm">-->
+<!--            <div class="form-group">-->
+<!--                <label for="prompt">소설 설정 (장르, 인물, 배경 등을 자유롭게 입력하세요)</label>-->
+<!--                <textarea id="prompt" rows="4" placeholder="예: 미래 도시를 배경으로 한 사이버펑크 장르의 소설. 주인공은 AI 프로그래머로, 자신이 만든 AI가 의식을 갖게 되면서 벌어지는 이야기"></textarea>-->
+<!--            </div>-->
+
+<!--            <div class="options-grid">-->
+<!--                <div class="form-group">-->
+<!--                    <label for="genre">장르</label>-->
+<!--                    <select id="genre">-->
+<!--                        <option value="판타지">판타지</option>-->
+<!--                        <option value="SF">SF</option>-->
+<!--                        <option value="로맨스">로맨스</option>-->
+<!--                        <option value="스릴러">스릴러</option>-->
+<!--                        <option value="미스터리">미스터리</option>-->
+<!--                        <option value="역사">역사</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label for="length">길이</label>-->
+<!--                    <select id="length">-->
+<!--                        <option value="짧은">짧은 이야기 (1-2 페이지)</option>-->
+<!--                        <option value="중간">중간 길이 (3-5 페이지)</option>-->
+<!--                        <option value="긴">긴 이야기 (여러 챕터)</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label for="style">문체 스타일</label>-->
+<!--                    <select id="style">-->
+<!--                        <option value="현대적">현대적</option>-->
+<!--                        <option value="고전적">고전적</option>-->
+<!--                        <option value="시적">시적</option>-->
+<!--                        <option value="간결한">간결한</option>-->
+<!--                        <option value="상세한">상세한</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label for="model">AI 모델</label>-->
+<!--                    <select id="model">-->
+<!--                        <option value="GROQ_LLAMA">GROQ</option>-->
+<!--                        <option value="TOGETHER_LLAMA">TOGETHER</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <button type="submit">소설 생성하기</button>-->
+<!--        </form>-->
+<!--    </div>-->
+
+<!--    <div class="result-section">-->
+<!--        <div class="loading">-->
+<!--            <img src="https://i.gifer.com/ZKZg.gif" alt="로딩 중">-->
+<!--            <p>AI가 창작 중입니다...</p>-->
+<!--        </div>-->
+
+<!--        <div class="novel-content" id="response">소설을 생성하려면 위 양식을 작성하고 '소설 생성하기' 버튼을 클릭하세요.</div>-->
+
+<!--        <div class="chapters" id="chapters">-->
+<!--            &lt;!&ndash; 챕터 버튼들이 여기에 동적으로 추가됩니다 &ndash;&gt;-->
+<!--        </div>-->
+
+<!--        <div class="controls">-->
+<!--            <button class="control-btn" id="copyBtn">복사하기</button>-->
+<!--            <button class="control-btn" id="saveBtn">TXT로 저장</button>-->
+<!--            <button class="control-btn" id="moreBtn">이어서 생성</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    // DOM 요소 가져오기-->
+<!--    const storyForm = document.getElementById('storyForm');-->
+<!--    const responseElement = document.getElementById('response');-->
+<!--    const loadingElement = document.querySelector('.loading');-->
+<!--    const chaptersContainer = document.getElementById('chapters');-->
+<!--    const copyBtn = document.getElementById('copyBtn');-->
+<!--    const saveBtn = document.getElementById('saveBtn');-->
+<!--    const moreBtn = document.getElementById('moreBtn');-->
+
+<!--    // 생성된 내용을 저장할 변수들-->
+<!--    let generatedContent = [];-->
+<!--    let currentChapter = 0;-->
+
+<!--    // 폼 제출 이벤트 리스너-->
+<!--    storyForm.addEventListener('submit', async (event) => {-->
+<!--        event.preventDefault();-->
+
+<!--        // 폼 입력 값 가져오기-->
+<!--        const promptInput = document.getElementById('prompt').value;-->
+<!--        const genre = document.getElementById('genre').value;-->
+<!--        const length = document.getElementById('length').value;-->
+<!--        const style = document.getElementById('style').value;-->
+<!--        const model = document.getElementById('model').value;-->
+
+<!--        // 프롬프트 구성-->
+<!--        const enhancedPrompt = `소설 작성 요청:-->
+<!--장르: ${genre}-->
+<!--길이: ${length}-->
+<!--문체: ${style}-->
+<!--설정: ${promptInput}-->
+
+<!--위 설정에 맞게 1장 분량의 소설을 작성해주세요. 제목도 포함해주세요.`;-->
+
+<!--        // 로딩 표시 보이기-->
+<!--        loadingElement.style.display = 'block';-->
+<!--        responseElement.textContent = '';-->
+
+<!--        try {-->
+<!--            // API 호출-->
+<!--            const response = await fetch(`./api?prompt=${encodeURIComponent(enhancedPrompt)}&model=${model}`, {-->
+<!--                headers: {-->
+<!--                    "Content-Type": "application/json"-->
+<!--                }-->
+<!--            });-->
+
+<!--            if (!response.ok) {-->
+<!--                throw new Error(`HTTP error! status: ${response.status}`);-->
+<!--            }-->
+
+<!--            const json = await response.json();-->
+
+<!--            // 첫 번째 챕터 저장-->
+<!--            generatedContent = [json.content];-->
+<!--            currentChapter = 0;-->
+
+<!--            // 결과 표시-->
+<!--            displayChapter(currentChapter);-->
+
+<!--            // 챕터 버튼 업데이트-->
+<!--            updateChapterButtons();-->
+
+<!--        } catch (error) {-->
+<!--            console.error("API 호출 중 오류 발생:", error);-->
+<!--            responseElement.textContent = "오류가 발생했습니다. 다시 시도해주세요.";-->
+<!--        } finally {-->
+<!--            // 로딩 표시 숨기기-->
+<!--            loadingElement.style.display = 'none';-->
+<!--        }-->
+<!--    });-->
+
+<!--    // 이어서 생성 버튼 클릭 이벤트-->
+<!--    moreBtn.addEventListener('click', async () => {-->
+<!--        const promptInput = document.getElementById('prompt').value;-->
+<!--        const genre = document.getElementById('genre').value;-->
+<!--        const style = document.getElementById('style').value;-->
+<!--        const model = document.getElementById('model').value;-->
+
+<!--        // 이전 내용 참조하여 프롬프트 구성-->
+<!--        const lastChapter = generatedContent[currentChapter];-->
+<!--        const enhancedPrompt = `이전 챕터 내용: ${lastChapter.substring(0, 500)}...-->
+
+<!--위 내용의 이어지는 다음 챕터(${currentChapter + 2}장)를 작성해주세요. 장르는 ${genre}, 문체는 ${style}입니다. ${promptInput}`;-->
+
+<!--        // 로딩 표시 보이기-->
+<!--        loadingElement.style.display = 'block';-->
+
+<!--        try {-->
+<!--            const response = await fetch(`./api?prompt=${encodeURIComponent(enhancedPrompt)}&model=${model}`, {-->
+<!--                headers: {-->
+<!--                    "Content-Type": "application/json"-->
+<!--                }-->
+<!--            });-->
+
+<!--            if (!response.ok) {-->
+<!--                throw new Error(`HTTP error! status: ${response.status}`);-->
+<!--            }-->
+
+<!--            const json = await response.json();-->
+
+<!--            // 새 챕터 추가-->
+<!--            generatedContent.push(json.content);-->
+<!--            currentChapter = generatedContent.length - 1;-->
+
+<!--            // 결과 표시-->
+<!--            displayChapter(currentChapter);-->
+
+<!--            // 챕터 버튼 업데이트-->
+<!--            updateChapterButtons();-->
+
+<!--        } catch (error) {-->
+<!--            console.error("API 호출 중 오류 발생:", error);-->
+<!--            responseElement.textContent = "오류가 발생했습니다. 다시 시도해주세요.";-->
+<!--        } finally {-->
+<!--            // 로딩 표시 숨기기-->
+<!--            loadingElement.style.display = 'none';-->
+<!--        }-->
+<!--    });-->
+
+<!--    // 복사하기 버튼 클릭 이벤트-->
+<!--    copyBtn.addEventListener('click', () => {-->
+<!--        const content = generatedContent[currentChapter];-->
+<!--        navigator.clipboard.writeText(content)-->
+<!--            .then(() => {-->
+<!--                alert("소설 내용이 클립보드에 복사되었습니다!");-->
+<!--            })-->
+<!--            .catch(err => {-->
+<!--                console.error("클립보드 복사 실패:", err);-->
+<!--                alert("클립보드 복사에 실패했습니다.");-->
+<!--            });-->
+<!--    });-->
+
+<!--    // TXT로 저장 버튼 클릭 이벤트-->
+<!--    saveBtn.addEventListener('click', () => {-->
+<!--        let content = '';-->
+
+<!--        // 모든 챕터를 하나의 파일로 저장-->
+<!--        generatedContent.forEach((chapter, index) => {-->
+<!--            content += `[${index + 1}장]\n\n${chapter}\n\n`;-->
+<!--        });-->
+
+<!--        const blob = new Blob([content], { type: 'text/plain' });-->
+<!--        const url = URL.createObjectURL(blob);-->
+<!--        const a = document.createElement('a');-->
+<!--        a.href = url;-->
+<!--        a.download = 'AI_소설.txt';-->
+<!--        document.body.appendChild(a);-->
+<!--        a.click();-->
+<!--        document.body.removeChild(a);-->
+<!--        URL.revokeObjectURL(url);-->
+<!--    });-->
+
+<!--    // 챕터 표시 함수-->
+<!--    function displayChapter(index) {-->
+<!--        if (generatedContent[index]) {-->
+<!--            responseElement.textContent = generatedContent[index];-->
+<!--            currentChapter = index;-->
+<!--        }-->
+<!--    }-->
+
+<!--    // 챕터 버튼 업데이트 함수-->
+<!--    function updateChapterButtons() {-->
+<!--        chaptersContainer.innerHTML = '';-->
+
+<!--        generatedContent.forEach((_, index) => {-->
+<!--            const button = document.createElement('button');-->
+<!--            button.className = `chapter-btn ${index === currentChapter ? 'active' : ''}`;-->
+<!--            button.textContent = `${index + 1}장`;-->
+<!--            button.addEventListener('click', () => {-->
+<!--                displayChapter(index);-->
+
+<!--                // 모든 버튼의 active 클래스 제거-->
+<!--                document.querySelectorAll('.chapter-btn').forEach(btn => {-->
+<!--                    btn.classList.remove('active');-->
+<!--                });-->
+
+<!--                // 현재 버튼에 active 클래스 추가-->
+<!--                button.classList.add('active');-->
+<!--            });-->
+
+<!--            chaptersContainer.appendChild(button);-->
+<!--        });-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="ko">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>AI 소설 생성기</title>-->
+<!--    <link-->
+<!--            rel="icon"-->
+<!--            type="image/png"-->
+<!--            href="./icons8-글쓰기-능력-stickers-96.png"-->
+<!--            sizes="96x96"-->
+<!--    />-->
+<!--    <style>-->
+<!--        @font-face {-->
+<!--            font-family: 'CookieRun-Regular';-->
+<!--            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/CookieRun-Regular.woff') format('woff');-->
+<!--            font-weight: normal;-->
+<!--            font-style: normal;-->
+<!--        }-->
+<!--        * {-->
+<!--            font-family: CookieRun-Regular, serif;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+<!--        body {-->
+<!--            background-color: #f5f5f5;-->
+<!--            color: #333;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 800px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 2rem;-->
+<!--        }-->
+<!--        header {-->
+<!--            text-align: center;-->
+<!--            margin-bottom: 2rem;-->
+<!--        }-->
+<!--        h1 {-->
+<!--            color: #6a4c93;-->
+<!--            margin-bottom: 0.5rem;-->
+<!--        }-->
+<!--        .subtitle {-->
+<!--            color: #666;-->
+<!--            font-size: 1rem;-->
+<!--        }-->
+<!--        .input-section {-->
+<!--            background-color: white;-->
+<!--            padding: 1.5rem;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);-->
+<!--            margin-bottom: 2rem;-->
+<!--        }-->
+<!--        .form-group {-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+<!--        label {-->
+<!--            display: block;-->
+<!--            margin-bottom: 0.5rem;-->
+<!--            font-weight: bold;-->
+<!--            color: #555;-->
+<!--        }-->
+<!--        input, select, textarea {-->
+<!--            width: 100%;-->
+<!--            padding: 0.8rem;-->
+<!--            border: 1px solid #ddd;-->
+<!--            border-radius: 5px;-->
+<!--            font-size: 1rem;-->
+<!--        }-->
+<!--        .options-grid {-->
+<!--            display: grid;-->
+<!--            grid-template-columns: 1fr 1fr;-->
+<!--            gap: 1rem;-->
+<!--        }-->
+<!--        button {-->
+<!--            background-color: #6a4c93;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 0.8rem 1.5rem;-->
+<!--            border-radius: 5px;-->
+<!--            font-size: 1rem;-->
+<!--            cursor: pointer;-->
+<!--            transition: background-color 0.3s;-->
+<!--            width: 100%;-->
+<!--        }-->
+<!--        button:hover {-->
+<!--            background-color: #583d7a;-->
+<!--        }-->
+<!--        .result-section {-->
+<!--            background-color: white;-->
+<!--            padding: 1.5rem;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);-->
+<!--            min-height: 300px;-->
+<!--            position: relative;-->
+<!--        }-->
+<!--        .novel-content {-->
+<!--            white-space: pre-wrap;-->
+<!--            line-height: 1.6;-->
+<!--            font-family: "Nanum Myeongjo", serif;-->
+<!--            padding: 1rem;-->
+<!--            max-height: 500px;-->
+<!--            overflow-y: auto;-->
+<!--        }-->
+<!--        .loading {-->
+<!--            display: none;-->
+<!--            position: absolute;-->
+<!--            top: 50%;-->
+<!--            left: 50%;-->
+<!--            transform: translate(-50%, -50%);-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        .loading img {-->
+<!--            width: 50px;-->
+<!--            height: 50px;-->
+<!--        }-->
+<!--        .controls {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            margin-top: 1rem;-->
+<!--        }-->
+<!--        .control-btn {-->
+<!--            background-color: #f0f0f0;-->
+<!--            color: #333;-->
+<!--            border: 1px solid #ddd;-->
+<!--            padding: 0.5rem 1rem;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--        .chapters {-->
+<!--            margin-top: 1rem;-->
+<!--            display: flex;-->
+<!--            flex-wrap: wrap;-->
+<!--            gap: 0.5rem;-->
+<!--        }-->
+<!--        .chapter-btn {-->
+<!--            background-color: #f0f0f0;-->
+<!--            color: #333;-->
+<!--            border: 1px solid #ddd;-->
+<!--            padding: 0.3rem 0.6rem;-->
+<!--            border-radius: 3px;-->
+<!--            cursor: pointer;-->
+<!--            font-size: 0.8rem;-->
+<!--        }-->
+<!--        .chapter-btn.active {-->
+<!--            background-color: #6a4c93;-->
+<!--            color: white;-->
+<!--            border-color: #6a4c93;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <header>-->
+<!--        <h1>아주 소설 쓰고 앉아있네</h1>-->
+<!--        <p class="subtitle">진짜 소설 쓰겠습니다.</p>-->
+<!--    </header>-->
+
+<!--    <div class="input-section">-->
+<!--        <form id="storyForm">-->
+<!--            <div class="form-group">-->
+<!--                <label for="prompt">소설 설정 (장르, 인물, 배경 등을 자유롭게 입력하세요)</label>-->
+<!--                <textarea id="prompt" rows="4" placeholder="예: 미래 도시를 배경으로 한 사이버펑크 장르의 소설. 주인공은 AI 프로그래머로, 자신이 만든 AI가 의식을 갖게 되면서 벌어지는 이야기"></textarea>-->
+<!--            </div>-->
+
+<!--            <div class="options-grid">-->
+<!--                <div class="form-group">-->
+<!--                    <label for="genre">장르</label>-->
+<!--                    <select id="genre">-->
+<!--                        <option value="판타지">판타지</option>-->
+<!--                        <option value="SF">SF</option>-->
+<!--                        <option value="로맨스">로맨스</option>-->
+<!--                        <option value="스릴러">스릴러</option>-->
+<!--                        <option value="미스터리">미스터리</option>-->
+<!--                        <option value="역사">역사</option>-->
+<!--                        <option value="코미디">코미디</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label for="length">길이</label>-->
+<!--                    <select id="length">-->
+<!--                        <option value="짧은">짧은 이야기 (1-2 페이지)</option>-->
+<!--                        <option value="중간">중간 길이 (3-5 페이지)</option>-->
+<!--                        <option value="긴">긴 이야기 (여러 챕터)</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label for="style">문체 스타일</label>-->
+<!--                    <select id="style">-->
+<!--                        <option value="현대적">현대적</option>-->
+<!--                        <option value="고전적">고전적</option>-->
+<!--                        <option value="시적">시적</option>-->
+<!--                        <option value="간결한">간결한</option>-->
+<!--                        <option value="상세한">상세한</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+<!--                <div class="form-group">-->
+<!--                    <label for="model">AI 모델</label>-->
+<!--                    <select id="model">-->
+<!--                        <option value="gemini-2.0-flash">GEMINI</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <button type="submit">소설 생성하기</button>-->
+<!--        </form>-->
+<!--    </div>-->
+
+<!--    <div class="result-section">-->
+<!--        <div class="loading">-->
+<!--            <img src="https://i.gifer.com/ZKZg.gif" alt="로딩 중">-->
+<!--            <p>AI가 창작 중입니다...</p>-->
+<!--        </div>-->
+
+<!--        <div class="novel-content" id="response">소설을 생성하려면 위 양식을 작성하고 '소설 생성하기' 버튼을 클릭하세요.</div>-->
+
+<!--        <div class="chapters" id="chapters">-->
+<!--            &lt;!&ndash; 챕터 버튼들이 여기에 동적으로 추가됩니다 &ndash;&gt;-->
+<!--        </div>-->
+
+<!--        <div class="controls">-->
+<!--            <button class="control-btn" id="copyBtn">복사하기</button>-->
+<!--            <button class="control-btn" id="saveBtn">TXT로 저장</button>-->
+<!--            <button class="control-btn" id="moreBtn">이어서 생성</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    // DOM 요소 가져오기-->
+<!--    const storyForm = document.getElementById('storyForm');-->
+<!--    const responseElement = document.getElementById('response');-->
+<!--    const loadingElement = document.querySelector('.loading');-->
+<!--    const chaptersContainer = document.getElementById('chapters');-->
+<!--    const copyBtn = document.getElementById('copyBtn');-->
+<!--    const saveBtn = document.getElementById('saveBtn');-->
+<!--    const moreBtn = document.getElementById('moreBtn');-->
+
+<!--    // 생성된 내용을 저장할 변수들-->
+<!--    let generatedContent = [];-->
+<!--    let currentChapter = 0;-->
+
+<!--    // 폼 제출 이벤트 리스너-->
+<!--    storyForm.addEventListener('submit', async (event) => {-->
+<!--        event.preventDefault();-->
+
+<!--        // 폼 입력 값 가져오기-->
+<!--        const promptInput = document.getElementById('prompt').value;-->
+<!--        const genre = document.getElementById('genre').value;-->
+<!--        const length = document.getElementById('length').value;-->
+<!--        const style = document.getElementById('style').value;-->
+<!--        const model = document.getElementById('model').value;-->
+
+<!--        // 프롬프트 구성-->
+<!--        const enhancedPrompt = `소설 작성 요청:-->
+<!--        장르: ${genre}-->
+<!--        길이: ${length}-->
+<!--        문체: ${style}-->
+<!--        설정: ${promptInput}-->
+<!--        위 설정에 맞게 1장 분량의 소설을 작성해주세요. 제목도 포함해주세요.`;-->
+
+<!--        // 로딩 표시 보이기-->
+<!--        loadingElement.style.display = 'block';-->
+<!--        responseElement.textContent = '';-->
+
+<!--        try {-->
+<!--            // API 호출-->
+<!--            const response = await fetch(`./gemini?prompt=${encodeURIComponent(enhancedPrompt)}&model=${model}`, {-->
+<!--                method: 'POST',-->
+<!--                headers: {-->
+<!--                    "Content-Type": "application/json"-->
+<!--                },-->
+<!--                body: JSON.stringify({-->
+<!--                    prompt: enhancedPrompt,-->
+<!--                    model: {-->
+<!--                        platform: "GEMINI",-->
+<!--                        name: model-->
+<!--                    }-->
+<!--                })-->
+<!--            });-->
+
+<!--            if (!response.ok) {-->
+<!--                throw new Error(`HTTP error! status: ${response.status}`);-->
+<!--            }-->
+
+<!--            const json = await response.json();-->
+
+<!--            // 첫 번째 챕터 저장-->
+<!--            generatedContent = [json.content];-->
+<!--            currentChapter = 0;-->
+
+<!--            // 결과 표시-->
+<!--            displayChapter(currentChapter);-->
+
+<!--            // 챕터 버튼 업데이트-->
+<!--            updateChapterButtons();-->
+
+<!--        } catch (error) {-->
+<!--            console.error("API 호출 중 오류 발생:", error);-->
+<!--            responseElement.textContent = "오류가 발생했습니다. 다시 시도해주세요.";-->
+<!--        } finally {-->
+<!--            // 로딩 표시 숨기기-->
+<!--            loadingElement.style.display = 'none';-->
+<!--        }-->
+<!--    });-->
+
+<!--    // 이어서 생성 버튼 클릭 이벤트-->
+<!--    moreBtn.addEventListener('click', async () => {-->
+<!--        const promptInput = document.getElementById('prompt').value;-->
+<!--        const genre = document.getElementById('genre').value;-->
+<!--        const style = document.getElementById('style').value;-->
+<!--        const model = document.getElementById('model').value;-->
+
+<!--        // 이전 내용 참조하여 프롬프트 구성-->
+<!--        const lastChapter = generatedContent[currentChapter];-->
+<!--        const enhancedPrompt = `이전 챕터 내용: ${lastChapter.substring(0, 500)}...-->
+<!--        위 내용의 이어지는 다음 챕터(${currentChapter + 2}장)를 작성해주세요. 장르는 ${genre}, 문체는 ${style}입니다. ${promptInput}`;-->
+
+<!--        // 로딩 표시 보이기-->
+<!--        loadingElement.style.display = 'block';-->
+
+<!--        try {-->
+<!--            const response = await fetch(`./gemini?prompt=${encodeURIComponent(enhancedPrompt)}&model=${model}`, {-->
+<!--                method: 'POST',-->
+<!--                headers: {-->
+<!--                    "Content-Type": "application/json"-->
+<!--                },-->
+<!--                body: JSON.stringify({-->
+<!--                    prompt: enhancedPrompt,-->
+<!--                    model: {-->
+<!--                        platform: "GEMINI",-->
+<!--                        name: model-->
+<!--                    }-->
+<!--                })-->
+<!--            });-->
+
+<!--            if (!response.ok) {-->
+<!--                throw new Error(`HTTP error! status: ${response.status}`);-->
+<!--            }-->
+
+<!--            const json = await response.json();-->
+
+<!--            // 새 챕터 추가-->
+<!--            generatedContent.push(json.content);-->
+<!--            currentChapter = generatedContent.length - 1;-->
+
+<!--            // 결과 표시-->
+<!--            displayChapter(currentChapter);-->
+
+<!--            // 챕터 버튼 업데이트-->
+<!--            updateChapterButtons();-->
+
+<!--        } catch (error) {-->
+<!--            console.error("API 호출 중 오류 발생:", error);-->
+<!--            responseElement.textContent = "오류가 발생했습니다. 다시 시도해주세요.";-->
+<!--        } finally {-->
+<!--            // 로딩 표시 숨기기-->
+<!--            loadingElement.style.display = 'none';-->
+<!--        }-->
+<!--    });-->
+
+<!--    // 복사하기 버튼 클릭 이벤트-->
+<!--    copyBtn.addEventListener('click', () => {-->
+<!--        const content = generatedContent[currentChapter];-->
+<!--        navigator.clipboard.writeText(content)-->
+<!--            .then(() => {-->
+<!--                alert("소설 내용이 클립보드에 복사되었습니다!");-->
+<!--            })-->
+<!--            .catch(err => {-->
+<!--                console.error("클립보드 복사 실패:", err);-->
+<!--                alert("클립보드 복사에 실패했습니다.");-->
+<!--            });-->
+<!--    });-->
+
+<!--    // TXT로 저장 버튼 클릭 이벤트-->
+<!--    saveBtn.addEventListener('click', () => {-->
+<!--        let content = '';-->
+
+<!--        // 모든 챕터를 하나의 파일로 저장-->
+<!--        generatedContent.forEach((chapter, index) => {-->
+<!--            content += `[${index + 1}장]\n\n${chapter}\n\n`;-->
+<!--        });-->
+
+<!--        const blob = new Blob([content], { type: 'text/plain' });-->
+<!--        const url = URL.createObjectURL(blob);-->
+<!--        const a = document.createElement('a');-->
+<!--        a.href = url;-->
+<!--        a.download = 'AI_소설.txt';-->
+<!--        document.body.appendChild(a);-->
+<!--        a.click();-->
+<!--        document.body.removeChild(a);-->
+<!--        URL.revokeObjectURL(url);-->
+<!--    });-->
+
+<!--    // 챕터 표시 함수-->
+<!--    function displayChapter(index) {-->
+<!--        if (generatedContent[index]) {-->
+<!--            responseElement.textContent = generatedContent[index];-->
+<!--            currentChapter = index;-->
+<!--        }-->
+<!--    }-->
+
+<!--    // 챕터 버튼 업데이트 함수-->
+<!--    function updateChapterButtons() {-->
+<!--        chaptersContainer.innerHTML = '';-->
+
+<!--        generatedContent.forEach((_, index) => {-->
+<!--            const button = document.createElement('button');-->
+<!--            button.className = `chapter-btn ${index === currentChapter ? 'active' : ''}`;-->
+<!--            button.textContent = `${index + 1}장`;-->
+<!--            button.addEventListener('click', () => {-->
+<!--                displayChapter(index);-->
+
+<!--                // 모든 버튼의 active 클래스 제거-->
+<!--                document.querySelectorAll('.chapter-btn').forEach(btn => {-->
+<!--                    btn.classList.remove('active');-->
+<!--                });-->
+
+<!--                // 현재 버튼에 active 클래스 추가-->
+<!--                button.classList.add('active');-->
+<!--            });-->
+
+<!--            chaptersContainer.appendChild(button);-->
+<!--        });-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,7 +857,7 @@
     <link
             rel="icon"
             type="image/png"
-            href="./icons8-글쓰기-능력-stickers-96.png"
+            href="./icons8-글쓰기-능력-stickers-96.png"
             sizes="96x96"
     />
     <style>
@@ -172,6 +1023,7 @@
                         <option value="스릴러">스릴러</option>
                         <option value="미스터리">미스터리</option>
                         <option value="역사">역사</option>
+                        <option value="코미디">코미디</option>
                     </select>
                 </div>
 
@@ -198,8 +1050,7 @@
                 <div class="form-group">
                     <label for="model">AI 모델</label>
                     <select id="model">
-                        <option value="GROQ_LLAMA">GROQ</option>
-                        <option value="TOGETHER_LLAMA">TOGETHER</option>
+                        <option value="gemini-2.0-flash">GEMINI</option>
                     </select>
                 </div>
             </div>
@@ -267,8 +1118,8 @@
         responseElement.textContent = '';
 
         try {
-            // API 호출
-            const response = await fetch(`./api?prompt=${encodeURIComponent(enhancedPrompt)}&model=${model}`, {
+            // 단순화된 API 호출 (GET 요청)
+            const response = await fetch(`./gemini?prompt=${encodeURIComponent(enhancedPrompt)}`, {
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -280,8 +1131,18 @@
 
             const json = await response.json();
 
-            // 첫 번째 챕터 저장
-            generatedContent = [json.content];
+            // 응답 처리
+            if (json.candidates && json.candidates.length > 0) {
+                // Gemini API 직접 응답 형식 처리
+                const content = json.candidates[0].content.parts[0].text;
+                generatedContent = [content];
+            } else if (json.content) {
+                // APIService를 통한 응답 형식 처리
+                generatedContent = [json.content];
+            } else {
+                throw new Error("응답 형식을 처리할 수 없습니다");
+            }
+
             currentChapter = 0;
 
             // 결과 표시
@@ -309,14 +1170,14 @@
         // 이전 내용 참조하여 프롬프트 구성
         const lastChapter = generatedContent[currentChapter];
         const enhancedPrompt = `이전 챕터 내용: ${lastChapter.substring(0, 500)}...
-
-위 내용의 이어지는 다음 챕터(${currentChapter + 2}장)를 작성해주세요. 장르는 ${genre}, 문체는 ${style}입니다. ${promptInput}`;
+        위 내용의 이어지는 다음 챕터(${currentChapter + 2}장)를 이야기가 자연스럽게 이어지도록 작성해주세요. 장르는 ${genre}, 문체는 ${style}입니다. ${promptInput}`;
 
         // 로딩 표시 보이기
         loadingElement.style.display = 'block';
 
         try {
-            const response = await fetch(`./api?prompt=${encodeURIComponent(enhancedPrompt)}&model=${model}`, {
+            // 단순화된 API 호출 (GET 요청)
+            const response = await fetch(`./gemini?prompt=${encodeURIComponent(enhancedPrompt)}`, {
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -328,8 +1189,20 @@
 
             const json = await response.json();
 
+            // 응답 처리
+            let newContent = '';
+            if (json.candidates && json.candidates.length > 0) {
+                // Gemini API 직접 응답 형식 처리
+                newContent = json.candidates[0].content.parts[0].text;
+            } else if (json.content) {
+                // APIService를 통한 응답 형식 처리
+                newContent = json.content;
+            } else {
+                throw new Error("응답 형식을 처리할 수 없습니다");
+            }
+
             // 새 챕터 추가
-            generatedContent.push(json.content);
+            generatedContent.push(newContent);
             currentChapter = generatedContent.length - 1;
 
             // 결과 표시
